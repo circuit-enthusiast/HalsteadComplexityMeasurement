@@ -88,7 +88,7 @@ class Program
     private static bool IsKeyword(string token) => javaKeywords.Contains(token);
     private static bool IsLiteral(string token) => int.TryParse(token, out _) || token.StartsWith("\"");
 
-    private static void ProduceReport(string rootProjectName, string[] javaFiles, string distinctOperands, 
+    private static void ProduceReport(string rootProjectName, string[] javaFiles, string distinctOperands,
     string distinctOperators, int totalOperands, int totalOperators, double difficulty, double volume)
     {
 
@@ -105,15 +105,17 @@ class Program
         string[] allReports = Directory.GetFiles(reportPath, "*.*", SearchOption.TopDirectoryOnly);
         int id = 0;
 
-        foreach (string item in allReports)
+        foreach (string existingReport in allReports)
         {
-            while (item.Contains(outName))
+            while (existingReport.Contains(outName + $"_{id}"))
             {
-                outName += $"_{id}";
                 id++;
             }
+            
         }
-
+        
+        outName += $"_{id}";
+        outName += $"_{rootProjectName.Split('\\')[rootProjectName.Split('\\').Length-2]}";
         outName += ".txt";
 
         string reportContent = @$"
@@ -142,6 +144,20 @@ Total number of operators: {totalOperators}
     public static void Main(string[] args)
     {
 
+        if (args[0].Equals("-h") || args[0].Equals("--help"))
+        {
+            string helpMsg = @$"
+            usage: hcm <arg>
+            args:
+            -h | --help                                                     display this help message
+            file source of the java file e.g. /path/to/java/project/dir/    will run the halstead metric report on the target java project
+            -no | --no-out                                                  will run without outputing report
+            ";
+
+            Console.WriteLine(helpMsg);
+            return;
+        }
+
         // Get all java file paths
         List<string> javaFile = GetSourceFiles(rootDirPath: args[0]);
 
@@ -167,8 +183,10 @@ Total number of operators: {totalOperators}
         Console.WriteLine($"Difficulty: {difficulty}");
         Console.WriteLine($"Volume: {volume}");
 
-        ProduceReport(rootProjectName: args[0], javaFiles: javaFile.ToArray(), distinctOperands: string.Join(" ", distinctOperands), distinctOperators: string.Join("\n", distinctOperators), totalOperands: totalOperands, totalOperators: totalOperators, difficulty: difficulty, volume: volume);
-
+        if (!args[1].Equals("--no-out") || !args[1].Equals("-no"))
+        {
+            ProduceReport(rootProjectName: args[0], javaFiles: javaFile.ToArray(), distinctOperands: string.Join(" ", distinctOperands), distinctOperators: string.Join("\n", distinctOperators), totalOperands: totalOperands, totalOperators: totalOperators, difficulty: difficulty, volume: volume);
+        }
     }
 
 
