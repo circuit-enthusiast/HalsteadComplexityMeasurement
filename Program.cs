@@ -183,10 +183,13 @@ Total number of operators: {totalOperators}
         Console.WriteLine($"Difficulty: {difficulty}");
         Console.WriteLine($"Volume: {volume}");
 
-        if (!args[1].Equals("--no-out") || !args[1].Equals("-no"))
+        if (args.Length > 2)
         {
-            ProduceReport(rootProjectName: args[0], javaFiles: javaFile.ToArray(), distinctOperands: string.Join(" ", distinctOperands), distinctOperators: string.Join("\n", distinctOperators), totalOperands: totalOperands, totalOperators: totalOperators, difficulty: difficulty, volume: volume);
+            if(!args[1].Equals("--no-out") || !args[1].Equals("-no")){
+                return;
+            }
         }
+        ProduceReport(rootProjectName: args[0], javaFiles: javaFile.ToArray(), distinctOperands: string.Join(" ", distinctOperands), distinctOperators: string.Join("\n", distinctOperators), totalOperands: totalOperands, totalOperators: totalOperators, difficulty: difficulty, volume: volume);
     }
 
 
